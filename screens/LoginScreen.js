@@ -3,13 +3,15 @@ import React, { useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
 
-const LoginScreen = () => {
+const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signIn = () => {
+  const signIn = () => {};
 
-  }
+  const goRegister = () => {
+    navigation.navigate("Register");
+  };
 
   return (
     <KeyboardAvoidingView behavior="padding" enabled style={styles.container}>
@@ -36,8 +38,13 @@ const LoginScreen = () => {
       </View>
 
       <Button containerStyle={styles.button} onPress={signIn} title="Login" />
-      <Button containerStyle={styles.button} type="outline" title="Register" />
-      <View style={{height:100}} />
+      <Button
+        containerStyle={styles.button}
+        onPress={goRegister}
+        type="outline"
+        title="Register"
+      />
+      <View style={{ height: 100 }} />
     </KeyboardAvoidingView>
   );
 };
@@ -50,13 +57,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
   inputContainer: {
-    width: 300
+    width: 300,
   },
   button: {
     marginTop: 10,
     width: 200,
-  }
+  },
 });
