@@ -2,20 +2,31 @@ import React, { useLayoutEffect, useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Text } from "react-native-elements";
+import { auth } from "../firebase";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  
-  const register = () => {};
 
-  useLayoutEffect(()=>{
+  const register = () => {
+    auth
+      .createUserWithEmailAndPassword(email, password)
+      .then((authUser) => {
+        authUser.user.updateProfile({
+          displayName: name,
+          photoURL: imageUrl || "https://e7.pngegg.com/pngimages/450/656/png-clipart-programmer-computer-icons-ninja-saga-computer-software-ninja-computer-sticker-thumbnail.png"
+        })
+      })
+      .catch((error) => alert(error));
+  };
+
+  useLayoutEffect(() => {
     navigation.setOptions({
       headerBackTitle: "Back to Login",
-    })
-  },[navigation])
+    });
+  }, [navigation]);
 
   return (
     <KeyboardAvoidingView behavior="padding" style={styles.container}>
@@ -64,13 +75,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     padding: 10,
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
   inputContainer: {
     width: 300,
   },
   button: {
     width: 200,
-    marginTop: 10
+    marginTop: 10,
   },
 });

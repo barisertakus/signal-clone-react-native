@@ -1,7 +1,8 @@
 import { StatusBar } from "expo-status-bar";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
 import { Button, Input, Image } from "react-native-elements";
+import { auth } from "../firebase";
 
 const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
@@ -12,6 +13,16 @@ const LoginScreen = ({ navigation }) => {
   const goRegister = () => {
     navigation.navigate("Register");
   };
+
+  useEffect(()=>{
+    const unsubscribe = auth.onAuthStateChanged((authUser)=>{
+      if(authUser) {
+        navigation.replace("Home");
+      }
+    })
+
+    return unsubscribe
+  },[])
 
   return (
     <KeyboardAvoidingView behavior="padding" enabled style={styles.container}>
