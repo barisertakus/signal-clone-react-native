@@ -8,7 +8,12 @@ const LoginScreen = ({ navigation }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const signIn = () => {};
+  const signIn = () => {
+    auth.signInWithEmailAndPassword(email, password).then(()=>{
+      navigation.navigate("Home")
+    })
+    .catch(error=>alert(error))
+  };
 
   const goRegister = () => {
     navigation.navigate("Register");
