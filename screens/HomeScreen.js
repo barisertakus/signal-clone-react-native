@@ -17,6 +17,9 @@ const HomeScreen = ({ navigation }) => {
     auth.signOut().then(() => navigation.replace("Login"));
   };
 
+  const goAddChat = () => {
+    navigation.navigate("AddChat");
+  };
 
   const headerLeft = (
     <View style={styles.headerLeft}>
@@ -32,7 +35,7 @@ const HomeScreen = ({ navigation }) => {
         <AntDesign name="camerao" size={24} color="black" />
       </TouchableOpacity>
 
-      <TouchableOpacity activeOpacity={0.5}>
+      <TouchableOpacity onPress={goAddChat} activeOpacity={0.5}>
         <SimpleLineIcons name="pencil" size={24} color="black" />
       </TouchableOpacity>
     </View>
