@@ -6,8 +6,11 @@ import { db } from "../firebase";
 
 const CustomListItem = ({ id, chatName, enterChat }) => {
 
-  const [lastPhotoURL, setLastPhotoURL] = useState("");
-  const [lastMessage, setLastMessage] = useState("")
+  const [lastMessage, setLastMessage] = useState({
+    photoURL: "",
+    message: "",
+    displayName: "",
+  });
 
   useEffect(() => {
     const q = query(
@@ -18,8 +21,11 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
     const unsubscribe = onSnapshot(q, (snapshot) => {
       if (snapshot.docs.length){
         const data = snapshot.docs[0].data()
-        setLastPhotoURL(data.photoURL);
-        setLastMessage(data.message)
+        setLastMessage({
+          photoURL: data.photoURL,
+          message: data.message,
+          displayName: data.displayName
+        })
       }
     });
     
@@ -31,15 +37,15 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
       <Avatar
         rounded
         source={{
-          uri: lastPhotoURL || undefined,
+          uri: lastMessage.photoURL || undefined,
         }}
       />
       <ListItem.Content>
-        <ListItem.Title style={styles.fontListTitle}>
-          {chatName}
-        </ListItem.Title>
+        <ListItem.Title style={styles.fontListTitle}>{chatName}</ListItem.Title>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          {lastMessage || "Signal message"}
+          {lastMessage.displayName && lastMessage.message
+            ? lastMessage.displayName + " : " + lastMessage.message
+            : "Signal message"}
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
