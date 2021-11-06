@@ -16,11 +16,12 @@ import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { Keyboard } from "react-native";
 import { auth, db } from "../firebase";
-import { addDoc, collection, serverTimestamp } from "@firebase/firestore";
+import { addDoc, collection, getDocs, onSnapshot, orderBy, query, serverTimestamp } from "@firebase/firestore";
 
 const ChatScreen = ({ navigation, route }) => {
   const { id, chatName } = route.params;
   const [input, setInput] = useState("");
+  const [messages, setMessages] = useState([]);
 
   const sendMessage = () => {
     Keyboard.dismiss();
@@ -81,6 +82,21 @@ const ChatScreen = ({ navigation, route }) => {
     });
   }, [navigation]);
 
+  useLayoutEffect(() => {
+    const messagesRef = collection(db, "chats/" + id + "/messages");
+    const q = query(messagesRef, orderBy("timestamp", "desc"));
+    const snapshot = onSnapshot(q, (snapshot) => {
+      setMessages(
+        snapshot.docs.map((doc) => ({
+          id: doc.id,
+          data: doc.data(),
+        }))
+      );
+    });
+
+    return snapshot;
+  }, [route]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -89,9 +105,30 @@ const ChatScreen = ({ navigation, route }) => {
         style={styles.container}
         keyboardVerticalOffset={90}
       >
-        <TouchableWithoutFeedback onPress={()=>Keyboard.dismiss()}>
+        <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <>
-            <ScrollView></ScrollView>
+            <ScrollView>
+              {messages.map((message) => (
+                <View
+                  key={message.id}
+                  style={
+                    message.data.email === auth.currentUser.email
+                      ? styles.receiver : styles.sender
+                      
+                  }
+                >
+                  <Avatar source={{uri: message.data.photoURL}} rounded/>
+                  <Text
+                    style={
+                      message.data.email === auth.currentUser.email
+                        ? styles.receiverText  : styles.senderText
+                    }
+                  >
+                    {message.data.message}
+                  </Text>
+                </View>
+              ))}
+            </ScrollView>
             <View style={styles.footer}>
               <TextInput
                 value={input}
@@ -149,6 +186,16 @@ const styles = StyleSheet.create({
     flex: 1,
     bottom: 0,
     height: 40,  
+  },
+  receiver:{
+  },
+  sender:{
+  },
+  receiverText:{
+
+  },
+  senderText:{
+    
   },
   footer: {
     flexDirection: "row",
