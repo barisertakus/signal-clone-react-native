@@ -57,7 +57,7 @@ const HomeScreen = ({ navigation }) => {
       headerLeft: () => headerLeft,
       headerRight: () => headerRight,
     });
-  }, [navigation]);
+  }, [navigation, auth.currentUser.photoURL]);
 
   useEffect(()=>{
 
@@ -100,6 +100,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   container: {
-    height: '100%'
+    height: '100%',
+    flexGrow: 1
   }
 });
