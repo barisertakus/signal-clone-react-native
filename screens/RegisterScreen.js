@@ -16,7 +16,7 @@ const RegisterScreen = ({ navigation }) => {
       .then((authUser) => {
         updateProfile(authUser.user,{
           displayName: name,
-          photoURL: imageUrl || "https://e7.pngegg.com/pngimages/450/656/png-clipart-programmer-computer-icons-ninja-saga-computer-software-ninja-computer-sticker-thumbnail.png"
+          photoURL: imageUrl || "https://www.nj.com/resizer/zovGSasCaR41h_yUGYHXbVTQW2A=/1280x0/smart/cloudfront-us-east-1.images.arcpublishing.com/advancelocal/SJGKVE5UNVESVCW7BBOHKQCZVE.jpg"
         })
       })
       .catch((error) => alert(error));

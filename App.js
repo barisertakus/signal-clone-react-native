@@ -9,7 +9,10 @@ import HomeScreen from "./screens/HomeScreen";
 import AddChatScreen from "./screens/AddChatScreen";
 import ChatScreen from "./screens/ChatScreen";
 
-LogBox.ignoreLogs(["AsyncStorage has been extracted from react-native"])
+LogBox.ignoreLogs([
+  "AsyncStorage has been extracted from react-native",
+  "Setting a timer for a long period of time, i.e. multiple minutes",
+]);
 
 const Stack = createStackNavigator();
 
