@@ -1,3 +1,4 @@
+import { onAuthStateChanged, signInWithEmailAndPassword } from "@firebase/auth";
 import { StatusBar } from "expo-status-bar";
 import React, { useEffect, useState } from "react";
 import { KeyboardAvoidingView, StyleSheet, Text, View } from "react-native";
@@ -9,7 +10,7 @@ const LoginScreen = ({ navigation }) => {
   const [password, setPassword] = useState("");
 
   const signIn = () => {
-    auth.signInWithEmailAndPassword(email, password).then(()=>{
+    signInWithEmailAndPassword(auth,email,password).then(()=>{
       navigation.navigate("Home")
     })
     .catch(error=>alert(error))
@@ -20,7 +21,7 @@ const LoginScreen = ({ navigation }) => {
   };
 
   useEffect(()=>{
-    const unsubscribe = auth.onAuthStateChanged((authUser)=>{
+    const unsubscribe = onAuthStateChanged(auth,(authUser)=>{
       if(authUser) {
         navigation.replace("Home");
       }

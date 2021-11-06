@@ -11,6 +11,7 @@ import { Avatar } from "react-native-elements";
 import CustomListItem from "../components/CustomListItem";
 import { AntDesign, SimpleLineIcons } from "@expo/vector-icons";
 import { auth, db } from "../firebase";
+import { collection, onSnapshot } from "@firebase/firestore";
 
 const HomeScreen = ({ navigation }) => {
 
@@ -59,12 +60,13 @@ const HomeScreen = ({ navigation }) => {
   }, [navigation]);
 
   useEffect(()=>{
-    const unsubscribe = db.collection('chats').onSnapshot(snapshot => {
+
+    const unsubscribe = onSnapshot(collection(db,'chats'),(snapshot => {
       setChats(snapshot.docs.map(doc => ({
         id: doc.id,
         data: doc.data()
       })))
-    })
+    }))
 
     return unsubscribe
   },[])
