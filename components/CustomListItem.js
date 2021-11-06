@@ -7,6 +7,7 @@ import { db } from "../firebase";
 const CustomListItem = ({ id, chatName, enterChat }) => {
 
   const [lastPhotoURL, setLastPhotoURL] = useState("");
+  const [lastMessage, setLastMessage] = useState("")
 
   useEffect(() => {
     const q = query(
@@ -15,8 +16,11 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
       limit(1)
     );
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      if (snapshot.docs.length)
-        setLastPhotoURL(snapshot.docs[0].data().photoURL);
+      if (snapshot.docs.length){
+        const data = snapshot.docs[0].data()
+        setLastPhotoURL(data.photoURL);
+        setLastMessage(data.message)
+      }
     });
     
     return unsubscribe
@@ -35,7 +39,7 @@ const CustomListItem = ({ id, chatName, enterChat }) => {
           {chatName}
         </ListItem.Title>
         <ListItem.Subtitle numberOfLines={1} ellipsizeMode="tail">
-          Subtitle text. Subtitle text. Subtitle text. Subtitle text.
+          {lastMessage || "Signal message"}
         </ListItem.Subtitle>
       </ListItem.Content>
     </ListItem>
