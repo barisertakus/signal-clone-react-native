@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -16,27 +16,41 @@ import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { StatusBar } from "expo-status-bar";
 import { Keyboard } from "react-native";
 import { auth, db } from "../firebase";
-import { addDoc, collection, getDocs, onSnapshot, orderBy, query, serverTimestamp } from "@firebase/firestore";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  serverTimestamp,
+} from "@firebase/firestore";
 
 const ChatScreen = ({ navigation, route }) => {
   const { id, chatName } = route.params;
   const [input, setInput] = useState("");
   const [messages, setMessages] = useState([]);
 
+  const scrollViewRef = useRef();
+
   const sendMessage = () => {
     Keyboard.dismiss();
 
     const messagesRef = collection(db, "chats/" + id + "/messages");
 
-    addDoc(messagesRef,{
+    addDoc(messagesRef, {
       timestamp: serverTimestamp(),
       message: input,
       displayName: auth.currentUser.displayName,
       email: auth.currentUser.email,
-      photoURL: auth.currentUser.photoURL
-    })
+      photoURL: auth.currentUser.photoURL,
+    });
 
     setInput("");
+  };
+
+  const handleScrollContentChange = (animate) => {
+    scrollViewRef.current.scrollToEnd({ animated: animate });
   };
 
   const headerTitle = (
@@ -44,7 +58,7 @@ const ChatScreen = ({ navigation, route }) => {
       <Avatar
         rounded
         source={{
-          uri: "https://miro.medium.com/max/385/1*wxN_RRBtJe0QqgWMrm6hYw.png",
+          uri: messages[0]?.data.photoURL
         }}
       />
       <Text style={styles.titleText}>{chatName}</Text>
@@ -80,11 +94,11 @@ const ChatScreen = ({ navigation, route }) => {
       headerLeft: () => headerLeft,
       headerRight: () => headerRight,
     });
-  }, [navigation]);
+  }, [navigation, messages]);
 
   useLayoutEffect(() => {
     const messagesRef = collection(db, "chats/" + id + "/messages");
-    const q = query(messagesRef, orderBy("timestamp", "desc"));
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
     const snapshot = onSnapshot(q, (snapshot) => {
       setMessages(
         snapshot.docs.map((doc) => ({
@@ -97,6 +111,10 @@ const ChatScreen = ({ navigation, route }) => {
     return snapshot;
   }, [route]);
 
+  useEffect(()=>{
+    handleScrollContentChange(false);
+  },[scrollViewRef.current])
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="light" />
@@ -107,27 +125,45 @@ const ChatScreen = ({ navigation, route }) => {
       >
         <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
           <>
-            <ScrollView>
-              {messages.map((message) => (
-                <View
-                  key={message.id}
-                  style={
-                    message.data.email === auth.currentUser.email
-                      ? styles.receiver : styles.sender
-                      
-                  }
-                >
-                  <Avatar source={{uri: message.data.photoURL}} rounded/>
-                  <Text
-                    style={
-                      message.data.email === auth.currentUser.email
-                        ? styles.receiverText  : styles.senderText
-                    }
+            <ScrollView
+              contentContainerStyle={{ paddingTop: 15 }}
+              ref={scrollViewRef}  
+              onContentSizeChange={()=>handleScrollContentChange(true)}
+            >
+              {messages.map((message) => {
+                const sender =
+                  message.data.email === auth.currentUser.email ? true : false;
+                return (
+                  <View
+                    key={message.id}
+                    style={sender ? styles.sender : styles.receiver}
                   >
-                    {message.data.message}
-                  </Text>
-                </View>
-              ))}
+                    <Avatar
+                      source={{ uri: message.data.photoURL }}
+                      rounded
+                      size={30}
+                      // Props could be written here too.
+                      // But for web compatibility, containerStyle is used.
+                      containerStyle={{
+                        position: "absolute",
+                        bottom: -20,
+                        right: sender ? -7 : undefined,
+                        left: !sender ? -7 : undefined,
+                      }}
+                    />
+                    <Text
+                      style={sender ? styles.senderText : styles.receiverText}
+                    >
+                      {message.data.message}
+                    </Text>
+                    <Text
+                      style={sender ? styles.senderName : styles.receiverName}
+                    >
+                      {message.data.displayName}
+                    </Text>
+                  </View>
+                );
+              })}
             </ScrollView>
             <View style={styles.footer}>
               <TextInput
