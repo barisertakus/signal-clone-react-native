@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useState } from "react";
+import React, { useLayoutEffect, useState } from "react";
 import {
   KeyboardAvoidingView,
   Platform,
@@ -23,7 +23,19 @@ const ChatScreen = ({ navigation, route }) => {
   const [input, setInput] = useState("");
 
   const sendMessage = () => {
+    Keyboard.dismiss();
 
+    const messagesRef = collection(db, "chats/" + id + "/messages");
+
+    addDoc(messagesRef,{
+      timestamp: serverTimestamp(),
+      message: input,
+      displayName: auth.currentUser.displayName,
+      email: auth.currentUser.email,
+      photoURL: auth.currentUser.photoURL
+    })
+
+    setInput("");
   };
 
   const headerTitle = (
@@ -68,11 +80,6 @@ const ChatScreen = ({ navigation, route }) => {
       headerRight: () => headerRight,
     });
   }, [navigation]);
-
-
-  useEffect(()=>{
-
-  },[ ])
 
   return (
     <SafeAreaView style={styles.safeArea}>
