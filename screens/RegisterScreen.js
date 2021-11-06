@@ -3,6 +3,7 @@ import { KeyboardAvoidingView, StyleSheet, View } from "react-native";
 import { StatusBar } from "expo-status-bar";
 import { Button, Input, Text } from "react-native-elements";
 import { auth } from "../firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "@firebase/auth";
 
 const RegisterScreen = ({ navigation }) => {
   const [name, setName] = useState("");
@@ -11,10 +12,9 @@ const RegisterScreen = ({ navigation }) => {
   const [imageUrl, setImageUrl] = useState("");
 
   const register = () => {
-    auth
-      .createUserWithEmailAndPassword(email, password)
+    createUserWithEmailAndPassword(auth, email, password)
       .then((authUser) => {
-        authUser.user.updateProfile({
+        updateProfile(authUser.user,{
           displayName: name,
           photoURL: imageUrl || "https://e7.pngegg.com/pngimages/450/656/png-clipart-programmer-computer-icons-ninja-saga-computer-software-ninja-computer-sticker-thumbnail.png"
         })
