@@ -1,14 +1,33 @@
-import React from "react";
+import { collection, doc, limit, onSnapshot, orderBy, query } from "@firebase/firestore";
+import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Avatar, ListItem } from "react-native-elements";
+import { db } from "../firebase";
 
 const CustomListItem = ({ id, chatName, enterChat }) => {
+
+  const [lastPhotoURL, setLastPhotoURL] = useState("");
+
+  useEffect(() => {
+    const q = query(
+      collection(db, "chats/" + id + "/messages"),
+      orderBy("timestamp", "desc"),
+      limit(1)
+    );
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      if (snapshot.docs.length)
+        setLastPhotoURL(snapshot.docs[0].data().photoURL);
+    });
+    
+    return unsubscribe
+  }, []);
+
   return (
     <ListItem onPress={() => enterChat(id, chatName)} key={id} bottomDivider>
       <Avatar
         rounded
         source={{
-          uri: "https://miro.medium.com/max/385/1*wxN_RRBtJe0QqgWMrm6hYw.png",
+          uri: lastPhotoURL || undefined,
         }}
       />
       <ListItem.Content>
