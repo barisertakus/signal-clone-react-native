@@ -117,7 +117,6 @@ const ChatScreen = ({ navigation, route }) => {
 
   return (
     <SafeAreaView style={styles.safeArea}>
-      <StatusBar style="light" />
       <KeyboardAvoidingView // to push bottom view
         behavior={Platform.OS === "ios" ? "padding" : "height"}
         style={styles.container}
